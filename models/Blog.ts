@@ -2,15 +2,14 @@ import mongoose, { Document, Schema } from "mongoose";
 
 interface IBlog extends Document {
   title: string;
-  image: string;
+  image?: string;
   time: number;
   description: string;
   author: string;
 }
-
 const BlogSchema : Schema = new Schema({
   title: {type:String, required:true,unique:true},
-  image:{type:String,required:true},
+  image:{type:String,required:false},
   time:{type:Number,required:true},
   description:{type:String,required:true},
   author: {
@@ -23,6 +22,6 @@ const BlogSchema : Schema = new Schema({
 })
 
 
-const Blog = mongoose.model<IBlog>("Blog", BlogSchema)
+const Blog = mongoose.models.authblogs || mongoose.model<IBlog>("authBlog", BlogSchema)
 
 export default Blog;

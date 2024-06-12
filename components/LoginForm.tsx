@@ -8,7 +8,7 @@ const handleSubmit = async () => {};
 const LoginForm = () => {
   return (
     <>
-      <form onSubmit={handleSubmit}>
+      <form>
         <div className="grid w-full items-center gap-4">
           <div className="flex flex-col space-y-1.5">
             <Label htmlFor="name">Email</Label>

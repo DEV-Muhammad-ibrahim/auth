@@ -16,7 +16,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
    if(!title || !image || !description || !author){
     return NextResponse.json({message:"Credentials are required"})
    }
-    const response = NextResponse.json({message:"Blog is pending"},{status:200})
+    const response = NextResponse.json({message:"Blog Posted"},{status:200})
   
   
 

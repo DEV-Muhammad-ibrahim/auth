@@ -22,7 +22,7 @@ interface IUser {
   password: string;
 }
 
-export default function CardWithForm() {
+export default function SignUp() {
   const router = useRouter();
   const [user, setUser] = useState({
     name: "",

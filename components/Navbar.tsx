@@ -7,8 +7,12 @@ const Navbar = () => {
     <nav>
       <h1 className="mb-2">Blogs</h1>
       <div className="flex justify-between space-x-4">
-        <Button>Create Blogs</Button>
-        <Button variant="outline">View your blogs</Button>
+        <Button>
+          <Link href="/createBlog">Create Blogs</Link>
+        </Button>
+        <Button variant="outline">
+          <Link href="blogs">View your blogs</Link>
+        </Button>
         <Button asChild>
           <Link href="/login">Login</Link>
         </Button>

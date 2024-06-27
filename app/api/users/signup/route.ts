@@ -24,7 +24,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
     password
    })
    const savedUser = await newUser.save()
-  console.log(savedUser)
+  // console.log(savedUser)
     
   //send verification email
    

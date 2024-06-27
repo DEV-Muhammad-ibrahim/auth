@@ -10,7 +10,6 @@ interface IBlog extends Document {
 const BlogSchema : Schema = new Schema({
   title: {type:String, required:true,unique:true},
   image:{type:String,required:false},
-  time:{type:Number,required:true},
   description:{type:String,required:true},
   author: {
     type: mongoose.Schema.Types.ObjectId,

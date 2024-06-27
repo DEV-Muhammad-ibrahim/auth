@@ -7,13 +7,13 @@ export function middleware(request : NextRequest)
 
     const isPublicPath = path.includes('/login') || path.includes('/signup') || path.includes('/verifyemail')
  
-const isPrivatePath =  path.includes('/profile') || path.includes('/createBlog') ||  path.includes('/blogs') 
+    const isPrivatePath =  path.includes('/profile') || path.includes('/createBlog') ||  path.includes('/blogs') 
 
     const token = request.cookies.get('token')?.value || '';
 
    
 
-    if(isPrivatePath && !token)
+    if(isPrivatePath && token ==='')
     {
         return NextResponse.redirect(new URL('/login' , request.nextUrl));
     }
@@ -33,7 +33,7 @@ export const config = {
         '/login',
         '/signup',
         '/blogs',
-        '/createBlogs',
+        '/createBlog',
         
     ],
 }

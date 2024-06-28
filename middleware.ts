@@ -34,6 +34,5 @@ export const config = {
         '/signup',
         '/blogs',
         '/createBlog',
-        
     ],
 }

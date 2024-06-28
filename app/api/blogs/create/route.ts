@@ -1,43 +1,84 @@
-import { NextApiHandler, NextApiRequest } from "next";
-import formidable from "formidable";
-import path from "path";
-import fs from "fs/promises";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
-const readFile = (
-  req: NextApiRequest,
-  saveLocally?: boolean
-): Promise<{ fields: formidable.Fields; files: formidable.Files }> => {
-  const options: formidable.Options = {};
-  if (saveLocally) {
-    options.uploadDir = path.join(process.cwd(), "/public/images");
-    options.filename = (name, ext, path, form) => {
-      return Date.now().toString() + "_" + path.originalFilename;
-    };
+import connection from "@/server/connection";
+import mime from "mime";
+import { join } from "path";
+import { stat, mkdir, writeFile } from "fs/promises";
+import { NextRequest, NextResponse } from "next/server";
+import _ from "lodash";
+import Blog from "@/models/Blog";
+
+import { getDataFromToken } from "@/helpers/getData";
+
+export async function POST(req: NextRequest) {
+  connection()
+    const formData = await req.formData();
+  
+    const title = formData.get("title") as string || null;
+    const description = formData.get("description") as string || null;
+    const image = formData.get("image") as File || null;
+  
+    const buffer = Buffer.from(await image.arrayBuffer());
+    const relativeUploadDir = `/uploads/${new Date(Date.now())
+      .toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+      .replace(/\//g, "-")}`;
+  
+    const uploadDir = join(process.cwd(), "public", relativeUploadDir);
+  
+    try {
+      await stat(uploadDir);
+    } catch (e: any) {
+      if (e.code === "ENOENT") {
+        // This is for checking the directory is exist (ENOENT : Error No Entry)
+        await mkdir(uploadDir, { recursive: true });
+      } else {
+        console.error(
+          "Error while trying to create directory when uploading a file\n",
+          e
+        );
+        return NextResponse.json(
+          { error: "Something went wrong." },
+          { status: 500 }
+        );
+      }
+    }
+  
+    try {
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      const filename = `${
+      image.name.replace(
+        /\.[^/.]+$/,
+        ""
+      )}-${uniqueSuffix}.${mime.extension(image.type)}`;
+      await writeFile(`${uploadDir}/${filename}`, buffer);
+      const fileUrl = `${relativeUploadDir}/${filename}`;
+  
+    const userId = await getDataFromToken(req)
+   if(!userId){
+    return NextResponse.json({message:"Please login"})
+   }
+    
+      // Save to database
+      const result = new Blog({
+        
+          title,
+          image: fileUrl,
+          description,
+          author:userId,
+        
+      });
+      console.log(result)
+      await result.save()
+      return NextResponse.json({ user: result ,userid:userId});
+    } catch (e) {
+      console.error("Error while trying to upload a file\n", e);
+      return NextResponse.json(
+        { error: "Something went wrong in putting it into database." },
+        { status: 500 }
+      );
+    }
   }
-  options.maxFileSize = 4000 * 1024 * 1024;
-  const form = formidable(options);
-  return new Promise((resolve, reject) => {
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      resolve({ fields, files });
-    });
-  });
-};
-
-const handler: NextApiHandler = async (req, res) => {
-  try {
-    await fs.readdir(path.join(process.cwd() + "/public", "/images"));
-  } catch (error) {
-    await fs.mkdir(path.join(process.cwd() + "/public", "/images"));
-  }
-  await readFile(req, true);
-  res.json({ done: "ok" });
-};
-
-export default handler;

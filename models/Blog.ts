@@ -12,8 +12,7 @@ const BlogSchema : Schema = new Schema({
   image:{type:String,required:false},
   description:{type:String,required:true},
   author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
     required: true,
   },
 },{
@@ -21,6 +20,6 @@ const BlogSchema : Schema = new Schema({
 })
 
 
-const Blog = mongoose.models.authblogs || mongoose.model<IBlog>("authBlog", BlogSchema)
+const Blog = mongoose.models.authBlog || mongoose.model<IBlog>("authBlog", BlogSchema)
 
 export default Blog;

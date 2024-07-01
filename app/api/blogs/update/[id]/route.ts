@@ -12,8 +12,9 @@ import { getDataFromToken } from "@/helpers/getData";
 
 export async function POST(req: NextRequest) {
   connection()
-    const formData = await req.formData();
   
+    const formData = await req.formData();
+    const blogId = formData.get('id') as string || null;
     const title = formData.get("title") as string || null;
     const description = formData.get("description") as string || null;
     const image = formData.get("image") as File || null;
@@ -49,18 +50,14 @@ export async function POST(req: NextRequest) {
     
       // Save to database
       if(!existingBlog){
-        const result = new Blog({
-        
-          title,
-          image: fileUrl,
-          description,
-          author:userId,
-        
-      });
-       console.log(result)
-       await result.save()
+      const updateBlog = await Blog.findByIdAndUpdate(blogId,{
+        title,
+        description,
+        image:fileUrl,
+      })
+      
        await writeFile(`${uploadDir}/${filename}`, buffer);
-       return NextResponse.json({ user: result });
+       return NextResponse.json({ user: updateBlog });
       }else{
         return NextResponse.json({message:"Title existing"})
         

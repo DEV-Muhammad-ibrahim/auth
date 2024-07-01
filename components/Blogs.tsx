@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,34 +8,53 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React from "react";
-
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Avatar, AvatarImage } from "./ui/avatar";
+interface blog {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+}
 export default function Blogs() {
+  const [blogs, setBlog] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("api/blogs/read");
+        setBlog(response.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   return (
     <main>
       <div className="grid grid-cols-3 gap-8">
-        <Card className="flex flex-col justify-between">
-          {}
-          <CardHeader className="flex-row gap-4 items-center">
-            <div>
-              <CardTitle>Aloo</CardTitle>
-              <CardDescription>20 mins to cook</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <p>
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. Eum ullam
-              minus ipsa aspernatur dicta beatae temporibus quidem vel quibusdam
-              voluptatem soluta maxime itaque ipsam a omnis necessitatibus
-              optio, et nobis?
-            </p>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button>View Recipe</Button>
-
-            {/* {recipe.vegan && <Badge variant="secondary">Vegan!!</Badge>} */}
-          </CardFooter>
-        </Card>
+        {blogs.map((item: blog) => (
+          <Card className="flex flex-col justify-between" key={item._id}>
+            {}
+            <CardHeader className="flex-row gap-4 items-center">
+              <div>
+                <Avatar>
+                  <AvatarImage src={item.image} />
+                </Avatar>
+              </div>
+              <div>
+                <CardTitle>{item.title}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <p>{item.description}</p>
+            </CardContent>
+            <CardFooter className="flex justify-between">
+              <Button>View Recipe</Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
     </main>
   );

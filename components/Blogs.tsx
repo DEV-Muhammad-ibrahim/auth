@@ -51,7 +51,7 @@ export default function Blogs() {
               <p>{item.description}</p>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button>View Recipe</Button>
+              <Button>View Blog</Button>
             </CardFooter>
           </Card>
         ))}

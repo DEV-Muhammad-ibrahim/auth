@@ -11,6 +11,8 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import DeleteBtn from "@/components/DeleteBtn";
+import Link from "next/link";
 interface blog {
   _id: string;
   title: string;
@@ -24,7 +26,6 @@ export default function Blogs() {
     const fetchData = async () => {
       try {
         const response = await axios.get("/api/blogs/author");
-        console.log("data", response);
         setBlog(response.data);
       } catch (error: any) {
         console.error("Error fetching data:", error);
@@ -33,6 +34,7 @@ export default function Blogs() {
 
     fetchData();
   }, []);
+
   return (
     <>
       <main>
@@ -54,7 +56,10 @@ export default function Blogs() {
                 <p>{item.description}</p>
               </CardContent>
               <CardFooter className="flex justify-between">
-                <Button>View Recipe</Button>
+                <Button>
+                  <Link href={`/blog/${item._id}`}>View Blog</Link>
+                </Button>
+                <DeleteBtn id={item._id} />
               </CardFooter>
             </Card>
           ))}

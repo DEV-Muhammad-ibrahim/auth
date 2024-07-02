@@ -1,83 +1,140 @@
 "use client";
-import { GetServerSideProps, NextPage } from "next";
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
-import fs from "fs/promises";
-import path from "path";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-interface Props {
-  dirs: string[];
+interface Blog {
+  title: string;
+  description: string;
+  image: File | null;
 }
+export default function CreateBlog() {
+  const router = useRouter();
+  const [blog, setBlog] = useState<Blog>({
+    title: "",
+    description: "",
+    image: null,
+  });
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [loading, setLoading] = useState(false);
 
-const Blog: NextPage<Props> = ({ dirs }) => {
-  const [uploading, setUploading] = useState(false);
-  const [selectedImage, setSelectedImage] = useState("");
-  const [selectedFile, setSelectedFile] = useState<File>();
+  // const handleInputChange = (
+  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  // ) => {
+  //   const { name, value } = e.target;
+  //   setBlog((prev) => ({ ...prev, [name]: value }));
+  // };
 
-  const handleUpload = async () => {
-    setUploading(true);
-    try {
-      if (!selectedFile) return;
-      const formData = new FormData();
-      formData.append("myImage", selectedFile);
-      const { data } = await axios.post("/api/blogs/create", formData);
-      console.log(data);
-    } catch (error: any) {
-      console.log(error.response?.data);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setBlog((prev) => ({ ...prev, image: e.target.files![0] }));
     }
-    setUploading(false);
+  };
+
+  useEffect(() => {
+    if (
+      blog.title.length > 0 &&
+      blog.description.length > 0 &&
+      blog.image != null
+    ) {
+      setButtonDisabled(false);
+    }
+  }, [blog]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("title", blog.title);
+    formData.append("description", blog.description);
+    if (blog.image) {
+      formData.append("image", blog.image);
+    }
+
+    try {
+      console.log(formData);
+      const response = await axios.post("/api/blogs/create", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response) {
+        // Redirect or update the UI after successful creation
+        router.push("/blogs");
+      } else {
+        console.error("Failed to create blog");
+      }
+    } catch (error) {
+      console.error("An error occurred while creating the blog:", error);
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-20 space-y-6">
-      <label>
-        <input
-          type="file"
-          hidden
-          onChange={({ target }) => {
-            if (target.files) {
-              const file = target.files[0];
-              setSelectedImage(URL.createObjectURL(file));
-              setSelectedFile(file);
-            }
-          }}
-        />
-        <div className="w-40 aspect-video rounded flex items-center justify-center border-2 border-dashed cursor-pointer">
-          {selectedImage ? (
-            <img src={selectedImage} alt="" />
-          ) : (
-            <span>Select Image</span>
-          )}
-        </div>
-      </label>
-      <button
-        onClick={handleUpload}
-        disabled={uploading}
-        style={{ opacity: uploading ? ".5" : "1" }}
-        className="bg-red-600 p-3 w-32 text-center rounded text-white"
-      >
-        {uploading ? "Uploading.." : "Upload"}
-      </button>
-      <div className="mt-20 flex flex-col space-y-3">
-        {/* {dirs.map((item) => (
-          <Link key={item} href={"/images/" + item}>
-            <a className="text-blue-500 hover:underline">{item}</a>
-          </Link>
-        ))} */}
-      </div>
-    </div>
-  );
-};
-// export const getServerSideProps: GetServerSideProps = async () => {
-//   const props = { dirs: [] };
-//   try {
-//     const dirs = await fs.readdir(path.join(process.cwd(), "/public/images"));
-//     props.dirs = dirs as any;
-//     return { props };
-//   } catch (error) {
-//     return { props };
-//   }
-// };
+    <>
+      <div className="flex justify-center">
+        <Card className="w-[450px]">
+          <CardHeader>
+            <CardTitle>
+              <div>
+                <h2>{loading ? "Creating" : "Create Blog"}</h2>
+              </div>
+            </CardTitle>
 
-export default Blog;
+            <CardDescription>Enter your credentials.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit}>
+              <div className="grid w-full items-center gap-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label>Title</Label>
+                  <Input
+                    placeholder="Title"
+                    value={blog.title}
+                    onChange={(e) =>
+                      setBlog({ ...blog, title: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label>Description</Label>
+                  <Textarea
+                    value={blog.description}
+                    onChange={(e) =>
+                      setBlog({ ...blog, description: e.target.value })
+                    }
+                    required
+                  ></Textarea>
+                </div>
+                <div className="flex flex-col space-y-1.5">
+                  <Label>Image</Label>
+                  <Input type="file" onChange={handleFileChange} required />
+                </div>
+                <div className="flex flex-col space-y-1.5"></div>
+              </div>
+            </form>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button onClick={handleSubmit}>
+              {buttonDisabled ? "Please fill the form" : "Create"}
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    </>
+  );
+}

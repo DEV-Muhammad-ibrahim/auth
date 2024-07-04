@@ -30,13 +30,6 @@ export default function CreateBlog() {
   const [buttonDisabled, setButtonDisabled] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  // const handleInputChange = (
-  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  // ) => {
-  //   const { name, value } = e.target;
-  //   setBlog((prev) => ({ ...prev, [name]: value }));
-  // };
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setBlog((prev) => ({ ...prev, image: e.target.files![0] }));
@@ -72,7 +65,6 @@ export default function CreateBlog() {
       });
 
       if (response) {
-        // Redirect or update the UI after successful creation
         router.push("/blogs");
       } else {
         console.error("Failed to create blog");

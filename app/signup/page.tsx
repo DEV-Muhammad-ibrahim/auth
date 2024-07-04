@@ -36,8 +36,7 @@ export default function SignUp() {
     try {
       setLoading(true);
       const response = await axios.post("/api/users/signup", user);
-      console.log(response, "Response");
-      console.log("Signup Success", response.data);
+
       router.push("/login");
     } catch (error: any) {
       const response = NextResponse.json(
@@ -47,6 +46,7 @@ export default function SignUp() {
         },
         { status: 400 }
       );
+      return response;
     }
   };
   useEffect(() => {

@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
           author:userId,
         
       });
-      console.log(result)
+
      await result.save()
       return NextResponse.json({ user: result });
     } catch (e) {

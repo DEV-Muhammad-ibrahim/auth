@@ -7,7 +7,7 @@ import React, { useEffect, useState } from "react";
 export default function Profile() {
   const router = useRouter();
   const [data, setData] = useState("nothing");
-  // window.location.reload();
+
   const logout = async () => {
     try {
       await axios.post("/api/users/logout");

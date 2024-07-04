@@ -21,7 +21,7 @@ const Navbar = () => {
               <Link href="/createBlog">Create Blogs</Link>
             </Button>
             <Button variant="outline">
-              <Link href="blogs">View your blogs</Link>
+              <Link href="/blogs">View your blogs</Link>
             </Button>
             <LogoutBtn />
           </>

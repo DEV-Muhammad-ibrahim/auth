@@ -1,33 +1,31 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request : NextRequest)
-{
+export function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
-    const isPublicPath = path.includes('/login') || path.includes('/signup') || path.includes('/verifyemail')
- 
-    const isPrivatePath =  path.includes('/profile') || path.includes('/createBlog') ||  path.includes('/blogs') 
+    // Public paths
+    const isPublicPath = ['/login', '/signup', '/verifyemail'].some(p => path.startsWith(p));
+    
+    // Private paths
+    const isPrivatePath = ['/profile', '/createBlog', '/blogs'].some(p => path.startsWith(p));
 
-    const token = request.cookies.get('token')?.value || '';
+    // Token validation
+    const token = request.cookies.get('token')?.value;
 
-   
-
-    if(isPrivatePath && token ==='')
-    {
-        return NextResponse.redirect(new URL('/login' , request.nextUrl));
-    }
-    if(isPublicPath && token)
-    {
-        return NextResponse.redirect(new URL('/' , request.nextUrl));
+    if (isPrivatePath && !token) {
+        // Redirect to login if trying to access a private page without a token
+        return NextResponse.redirect(new URL('/login', request.nextUrl));
     }
     
-
-
+    if (isPublicPath && token) {
+        // Redirect to home if trying to access a public page with a token
+        return NextResponse.redirect(new URL('/', request.nextUrl));
+    }
 }
 
 export const config = {
-    matcher:[
+    matcher: [
         '/',
         '/profile',
         '/login',

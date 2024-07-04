@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Avatar, AvatarImage } from "./ui/avatar";
+import Link from "next/link";
 interface blog {
   _id: string;
   title: string;
@@ -51,7 +52,9 @@ export default function Blogs() {
               <p>{item.description}</p>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button>View Blog</Button>
+              <Button>
+                <Link href={`/blog/${item._id}`}>View Blog</Link>
+              </Button>
             </CardFooter>
           </Card>
         ))}

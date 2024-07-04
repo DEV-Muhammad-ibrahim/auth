@@ -30,9 +30,8 @@ export default function LoginPage() {
     try {
       setLoading(true);
       const response = await axios.post("/api/users/login", user);
-      console.log(response, "Response");
-      console.log("login Success", response.data);
-      router.push("/blogs");
+      window.location.reload();
+      router.replace("/");
     } catch (error: any) {
       const response = NextResponse.json(
         {

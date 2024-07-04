@@ -3,7 +3,7 @@
 import connection from "@/server/connection";
 import mime from "mime";
 import { join } from "path";
-import { writeFile } from "fs/promises";
+import { stat, mkdir, writeFile } from "fs/promises";
 import { NextRequest, NextResponse } from "next/server";
 // import _ from "lodash";
 import Blog from "@/models/Blog";
@@ -30,7 +30,23 @@ export async function POST(req: NextRequest) {
   
     const uploadDir = join(process.cwd(), "public", relativeUploadDir);
   
-    
+    try {
+      await stat(uploadDir);
+    } catch (e: any) {
+      if (e.code === "ENOENT") {
+        
+        await mkdir(uploadDir, { recursive: true });
+      } else {
+        console.error(
+          "Error while trying to create directory when uploading a file\n",
+          e
+        );
+        return NextResponse.json(
+          { error: "Something went wrong." },
+          { status: 500 }
+        );
+      }
+    }
   
     try {
       const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
@@ -39,7 +55,7 @@ export async function POST(req: NextRequest) {
         /\.[^/.]+$/,
         ""
       )}-${uniqueSuffix}.${mime.extension(image.type)}`;
-      
+      await writeFile(`${uploadDir}/${filename}`, buffer);
       const fileUrl = `${relativeUploadDir}/${filename}`;
   
     const userId = await getDataFromToken(req)
@@ -48,8 +64,10 @@ export async function POST(req: NextRequest) {
    }
     
       // Save to database
-      if(!existingBlog){
-        const result = new Blog({
+      if(existingBlog){
+      return NextResponse.json({message:"Title existing"})
+    }
+      const result = new Blog({
         
           title,
           image: fileUrl,
@@ -57,16 +75,9 @@ export async function POST(req: NextRequest) {
           author:userId,
         
       });
-       console.log(result)
-       await result.save()
-       await writeFile(`${uploadDir}/${filename}`, buffer);
-       return NextResponse.json({ user: result });
-      }else{
-        return NextResponse.json({message:"Title existing"})
-        
-      }
-      
-    
+      console.log(result)
+     await result.save()
+      return NextResponse.json({ user: result });
     } catch (e) {
       console.error("Error while trying to upload a file\n", e);
       return NextResponse.json(

@@ -48,9 +48,7 @@ export default function Blogs() {
                 <CardTitle>{item.title}</CardTitle>
               </div>
             </CardHeader>
-            <CardContent>
-              <p>{item.description}</p>
-            </CardContent>
+
             <CardFooter className="flex justify-between">
               <Button>
                 <Link href={`/blog/${item._id}`}>View Blog</Link>

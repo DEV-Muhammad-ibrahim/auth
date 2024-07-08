@@ -13,12 +13,12 @@ export function middleware(request: NextRequest) {
     // Token validation
     const token = request.cookies.get('token')?.value;
 
-    if (isPrivatePath && !token) {
+    if (isPrivatePath && !request.cookies.get('token')) {
         // Redirect to login if trying to access a private page without a token
         return NextResponse.redirect(new URL('/login', request.nextUrl));
     }
     
-    if (isPublicPath && token) {
+    if (isPublicPath && request.cookies.get('token')) {
         // Redirect to home if trying to access a public page with a token
         return NextResponse.redirect(new URL('/', request.nextUrl));
     }

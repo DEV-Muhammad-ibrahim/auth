@@ -12,6 +12,9 @@ export default async function connection() {
       console.log("Please connect to database" + err)
       process.exit()
     })
+    if(!connection){
+      console.log("Something is creepy")
+    }
   
   } catch (error:any) {
     console.log("Something went wrong while connecting to database");
